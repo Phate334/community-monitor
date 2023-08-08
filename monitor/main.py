@@ -21,9 +21,9 @@ categories = ["cs.AI", "cs.CL", "cs.LG", "stat.ML"]
 @app.task("daily after 10:00")
 def fetch_arxiv():
     articles = []
+    today = datetime.today() - timedelta(days=2)  # UTC-5 timezone
+    yesterday = today - timedelta(days=1)
     for category in categories:
-        today = datetime.today() - timedelta(days=2)  # UTC-5 timezone
-        yesterday = today - timedelta(days=1)
         search = arxiv.Search(
             query=f"cat:{category} AND submittedDate:[{yesterday.strftime('%Y%m%d')} TO {today.strftime('%Y%m%d')}]",
             max_results=float("inf"),
