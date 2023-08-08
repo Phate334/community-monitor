@@ -15,7 +15,7 @@ app = Rocketry()
 logger.add("daily-job.log", backtrace=True, diagnose=True)
 
 # Define an array of categories to search for
-categories = ["cs.AI", "cs.CL", "cs.LG", "stat.ML"]
+categories = ["cs.AI"]
 
 
 @app.task("daily after 10:00")
