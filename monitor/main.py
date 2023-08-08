@@ -14,28 +14,32 @@ settings = get_settings()
 app = Rocketry()
 logger.add("daily-job.log", backtrace=True, diagnose=True)
 
+# Define an array of categories to search for
+categories = ["cs.AI"]
+
 
 @app.task("daily after 10:00")
 def fetch_arxiv():
+    articles = []
     today = datetime.today() - timedelta(days=2)  # UTC-5 timezone
     yesterday = today - timedelta(days=1)
-    search = arxiv.Search(
-        query=f"cat:cs.AI AND submittedDate:[{yesterday.strftime('%Y%m%d')} TO {today.strftime('%Y%m%d')}]",
-        max_results=float("inf"),
-    )
-    articles = []
-    for result in search.results():
-        articles.append(
-            ArxivArticle(
-                id=result.entry_id.split("/")[-1].replace(".", "-"),
-                arxiv_id=result.entry_id.split("/")[-1],
-                published=result.published.timestamp(),
-                title=result.title,
-                summary=result.summary.replace("\n", " "),
-                primary_category=result.primary_category,
-                tags=result.categories,
-            )
+    for category in categories:
+        search = arxiv.Search(
+            query=f"cat:{category} AND submittedDate:[{yesterday.strftime('%Y%m%d')} TO {today.strftime('%Y%m%d')}]",
+            max_results=float("inf"),
         )
+        for result in search.results():
+            articles.append(
+                ArxivArticle(
+                    id=result.entry_id.split("/")[-1].replace(".", "-"),
+                    arxiv_id=result.entry_id.split("/")[-1],
+                    published=result.published.timestamp(),
+                    title=result.title,
+                    summary=result.summary.replace("\n", " "),
+                    primary_category=result.primary_category,
+                    tags=result.categories,
+                )
+            )
 
     return articles
 
